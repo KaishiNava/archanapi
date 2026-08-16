@@ -1,0 +1,3 @@
+import Navbar from "@/components/Navbar";import Footer from "@/components/Footer";
+const plans=[["FREE USER","free","100 requests/day","Rp0"],["PREMIUM","premium","5.000 requests/day","Rp25.000"],["ENTERPRISE","enterprise","Custom / high limit","Custom"],["OWNER","owner","Unlimited admin access","Internal"]];
+export default function Pricing(){return <><Navbar/><main className="mx-auto max-w-7xl px-5 py-14"><h1 className="text-4xl font-black">Pricing & Roles</h1><div className="mt-8 grid gap-5 md:grid-cols-4">{plans.map(p=><div key={p[1]} className="glass rounded-3xl p-6"><div className="text-sm text-violet-300">{p[0]}</div><div className="mt-4 text-2xl font-black">{p[3]}</div><p className="mt-3 text-zinc-400">{p[2]}</p></div>)}</div></main><Footer/></>}

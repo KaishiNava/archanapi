@@ -1,0 +1,9 @@
+ "use client";
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
+export default function Register(){
+ const [email,setEmail]=useState("");const [password,setPassword]=useState("");const [username,setUsername]=useState("");const [msg,setMsg]=useState("");const [error,setError]=useState("");
+ async function submit(e){e.preventDefault();setMsg("");setError("");const supabase=createClient();const {data,error}=await supabase.auth.signUp({email,password,options:{data:{username},emailRedirectTo:`${location.origin}/auth/callback`}});if(error)setError(error.message);else setMsg(data.session?"Account created.":"Cek email untuk konfirmasi akun.");}
+ return <main className="grid-bg flex min-h-screen items-center justify-center p-5"><form onSubmit={submit} className="glass w-full max-w-md rounded-3xl p-7"><h1 className="text-3xl font-black">Create account</h1>{error&&<div className="mt-4 rounded-xl bg-red-500/10 p-3 text-sm text-red-300">{error}</div>}{msg&&<div className="mt-4 rounded-xl bg-emerald-500/10 p-3 text-sm text-emerald-300">{msg}</div>}<input required placeholder="Username" value={username} onChange={e=>setUsername(e.target.value)} className="mt-6 w-full rounded-xl border border-white/10 bg-white/5 p-3"/><input required type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} className="mt-3 w-full rounded-xl border border-white/10 bg-white/5 p-3"/><input required minLength={6} type="password" placeholder="Password (min 6)" value={password} onChange={e=>setPassword(e.target.value)} className="mt-3 w-full rounded-xl border border-white/10 bg-white/5 p-3"/><button className="mt-5 w-full rounded-xl bg-violet-600 p-3 font-bold">Create Account</button><p className="mt-5 text-sm text-zinc-500">Sudah punya akun? <Link className="text-violet-300" href="/login">Login</Link></p></form></main>;
+}
