@@ -2,20 +2,33 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 export async function middleware(request) {
-  let response = NextResponse.next({ request });
+  let response = NextResponse.next({
+    request,
+  });
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key =
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey =
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!url || !key) {
-    return NextResponse.redirect(
-      new URL("/login?error=missing_supabase_config", request.url)
-    );
+  // If auth is not configured, do not break public pages.
+  // Protected pages will redirect to login with a clear query parameter.
+  if (!supabaseUrl || !supabaseKey) {
+    const protectedPath =
+      request.nextUrl.pathname.startsWith("/dashboard") ||
+      request.nextUrl.pathname.startsWith("/admin");
+
+    if (protectedPath) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      url.searchParams.set("error", "missing_supabase_config");
+      return NextResponse.redirect(url);
+    }
+
+    return response;
   }
 
-  const supabase = createServerClient(url, key, {
+  const supabase = createServerClient(supabaseUrl, supabaseKey, {
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -38,18 +51,18 @@ export async function middleware(request) {
   // Refresh/validate the auth session before protected pages render.
   const {
     data: { claims },
+    error,
   } = await supabase.auth.getClaims();
 
-  const path = request.nextUrl.pathname;
   const protectedPath =
-    path.startsWith("/dashboard") || path.startsWith("/admin");
+    request.nextUrl.pathname.startsWith("/dashboard") ||
+    request.nextUrl.pathname.startsWith("/admin");
 
-  if (!protectedPath) return response;
-
-  if (!claims) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("next", path);
-    return NextResponse.redirect(loginUrl);
+  if (protectedPath && (error || !claims)) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.searchParams.set("next", request.nextUrl.pathname);
+    return NextResponse.redirect(url);
   }
 
   return response;
