@@ -42,3 +42,8 @@ The landing page is now a SaaS / Developer Tool Landing Page:
 - Lucide icons instead of raw emoji
 - Responsive navigation
 - Strong CTA and documentation flow
+
+
+## Auth / Vercel
+
+The project uses `@supabase/ssr` cookie-based sessions, a singleton browser client, and middleware session refresh for protected dashboard/admin routes. Configure `NEXT_PUBLIC_SUPABASE_URL` plus `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (or the legacy anon key) in Vercel.

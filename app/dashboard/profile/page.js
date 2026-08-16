@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { createClient } from "@/lib/supabase/server";
 import DashboardShell from "@/components/DashboardShell";
 export default async function Page(){const supabase=await createClient();const {data:{user}}=await supabase.auth.getUser();const {data:profile}=await supabase.from("profiles").select("*").eq("id",user.id).single();return <DashboardShell profile={profile}><div className="space-y-5"><div><h1 className="text-3xl font-black">Profile</h1></div><div className="glass rounded-2xl p-6"><p>Email: <b>{profile?.email}</b></p><p className="mt-2">Username: <b>{profile?.username}</b></p><p className="mt-2">Role: <b className="uppercase">{profile?.role}</b></p></div></div></DashboardShell>}
